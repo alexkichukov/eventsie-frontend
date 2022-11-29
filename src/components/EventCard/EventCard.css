@@ -1,0 +1,7 @@
+.card {
+  &:hover {
+    img {
+      @apply scale-105;
+    }
+  }
+}

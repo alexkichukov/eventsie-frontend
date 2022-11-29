@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.container {
+  @apply mx-auto max-w-7xl px-6;
+}
+
+html {
+  @apply bg-neutral-900 text-neutral-300;
+  font-family: Poppins, Roboto, sans-serif;
+}
+
+input,
+button,
+textarea {
+  @apply rounded-sm bg-neutral-800 px-3 py-2 outline-none;
+  &::placeholder {
+    @apply text-neutral-500;
+  }
+}
