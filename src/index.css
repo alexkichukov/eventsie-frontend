@@ -15,7 +15,8 @@ html {
 
 input,
 button,
-textarea {
+textarea,
+select {
   @apply rounded-sm bg-neutral-800 px-3 py-2 outline-none;
   &::placeholder {
     @apply text-neutral-500;
