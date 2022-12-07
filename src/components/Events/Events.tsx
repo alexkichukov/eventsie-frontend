@@ -1,40 +1,36 @@
+import { getEvents } from '@/requests/events'
+import { useState, useEffect } from 'react'
+import { toast } from 'react-toastify'
 import EventCard from '@/components/EventCard'
 
 const Events = () => {
+  const [events, setEvents] = useState<Event[]>([])
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const events = await getEvents()
+        setEvents(events)
+      } catch {
+        toast.error('Could not retrieve events')
+      }
+    }
+    fetchEvents()
+  }, [])
+
   return (
-    <div className='grid grid-cols-[repeat(4,auto)] justify-between'>
-      <EventCard
-        id='637aa2dd18afe47d2bd17882'
-        img='https://picsum.photos/400/203'
-        title='Title'
-        priceFrom='5'
-        location='Grand Hotel Millennium Sofia, 89B bulevard "Vitosha", 1463 Sofia'
-        host={{ name: 'Company', id: 'asdasdasd' }}
-      />
-      <EventCard
-        id='637aa2dd18afe47d2bd17881'
-        img='https://picsum.photos/400/202'
-        title='Title'
-        priceFrom='5'
-        location='Grand Hotel Millennium Sofia'
-        host={{ name: 'Company', id: 'asdasdasd' }}
-      />
-      <EventCard
-        id='637aa2dd18afe47d2bd17883'
-        img='https://picsum.photos/400/201'
-        title='Title'
-        priceFrom='5'
-        location='Grand Hotel Millennium Sofia, 89B bulevard "Vitosha", 1463 Sofia'
-        host={{ name: 'Other Company', id: 'asdasdasd' }}
-      />
-      <EventCard
-        id='637aa2dd18afe47d2bd17884'
-        img='https://picsum.photos/400/200'
-        title='Title'
-        priceFrom='5'
-        location='Grand Hotel Millennium Sofia, 89B bulevard "Vitosha", 1463 Sofia'
-        host={{ name: 'Company', id: 'asdasdasd' }}
-      />
+    <div className='grid grid-cols-[repeat(4,300px)] justify-between gap-y-6'>
+      {events.map((event) => (
+        <EventCard
+          key={event.id}
+          id={event.id}
+          title={event.title}
+          priceFrom={event.price.from}
+          priceTo={event.price.to}
+          location={`${event.location.address}, ${event.location.city}, ${event.location.postcode}`}
+          host={{ name: `${event.createdBy.firstName}`, id: event.createdBy.id }}
+        />
+      ))}
     </div>
   )
 }

@@ -1,16 +1,16 @@
+import { FaHeart, FaRegHeart, FaMapMarkerAlt, FaCalendarAlt, FaUserAlt } from 'react-icons/fa'
 import { useDispatch, useSelector } from '@/hooks'
+import { useNavigate } from 'react-router-dom'
 import { setUser } from '@/store/auth'
-import { FaBookmark, FaMapMarkerAlt, FaCalendarAlt, FaUserAlt } from 'react-icons/fa'
-import { IoClose } from 'react-icons/io5'
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
 import './EventCard.css'
 
 interface Props {
   id: string
-  img: string
   title: string
-  priceFrom: string
+  priceFrom: number
+  priceTo: number
   location: string
   host: {
     name: string
@@ -18,10 +18,17 @@ interface Props {
   }
 }
 
-const EventCard = ({ id, img, title, priceFrom, location, host }: Props) => {
+const EventCard = ({ id, title, priceFrom, priceTo, location, host }: Props) => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const user = useSelector((state) => state.auth.user)
+
   const isFavourite = user && user.favouriteEvents.includes(id)
+  const [image] = useState(
+    `https://picsum.photos/${400 + Math.floor(Math.random() * 100)}/${
+      200 + Math.floor(Math.random() * 100)
+    }`
+  )
 
   const setFavourite = async (favourite: boolean) => {
     if (!user) {
@@ -50,22 +57,34 @@ const EventCard = ({ id, img, title, priceFrom, location, host }: Props) => {
     }
   }
 
+  const priceLabel = () => {
+    if (!priceFrom && !priceTo) return 'Free'
+    else if (priceFrom && !priceTo) return `Starts from ${priceFrom}$`
+    else return `From ${priceFrom}$ to ${priceTo}$`
+  }
+
   return (
-    <div className='card pointer w-full max-w-[290px] cursor-pointer rounded-xl border border-neutral-900 bg-neutral-800 transition'>
+    <div
+      onClick={() => navigate(`/event/${id}`)}
+      className='card pointer w-full max-w-[290px] cursor-pointer rounded-xl border border-neutral-900 bg-neutral-800 transition'
+    >
       <div className='relative h-20 overflow-hidden rounded-tl-xl rounded-tr-xl'>
         <div className='absolute top-0 left-0 z-10 h-full w-full bg-gradient-to-r from-fuchsia-400 to-fuchsia-800 opacity-[0.15]'></div>
-        <img src={img} className='transition' />
+        <img src={image} className='transition' />
       </div>
       <div className='relative p-6'>
         <div
-          onClick={() => setFavourite(!isFavourite)}
-          className='absolute right-5 -top-5 z-20 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-neutral-900 text-neutral-50 transition hover:bg-neutral-700'
+          onClick={(e) => {
+            e.stopPropagation()
+            setFavourite(!isFavourite)
+          }}
+          className='absolute right-5 -top-5 z-20 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-neutral-900 pt-[2px] text-lg text-neutral-50 transition hover:bg-neutral-700'
         >
-          {isFavourite ? <IoClose className='text-2xl' /> : <FaBookmark />}
+          {isFavourite ? <FaHeart className='text-red-500' /> : <FaRegHeart />}
         </div>
         <div className=''>
           <h3 className='text-xl font-medium text-neutral-200'>{title}</h3>
-          <h4 className='text-neutral-400'>Starts at ${priceFrom}</h4>
+          <h4 className='text-neutral-400'>{priceLabel()}</h4>
           <div className='mt-3 grid grid-cols-[30px_auto] text-fuchsia-300'>
             <FaCalendarAlt className='mt-[2px]' />
             <span>Sat, Jun 18 2022</span>
@@ -78,12 +97,15 @@ const EventCard = ({ id, img, title, priceFrom, location, host }: Props) => {
             <FaUserAlt className='mt-[2px]' />
             <span>
               by{' '}
-              <Link
-                to={`user/${host.id}`}
+              <span
+                onClick={(e) => {
+                  e.stopPropagation()
+                  navigate(`/user/${host.id}`)
+                }}
                 className='font-medium text-neutral-100 hover:text-neutral-300 hover:underline'
               >
                 {host.name}
-              </Link>
+              </span>
             </span>
           </div>
         </div>

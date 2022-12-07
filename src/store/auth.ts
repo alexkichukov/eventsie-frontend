@@ -19,8 +19,8 @@ const initialState: AuthState = {
   user: null
 }
 
-export const counterSlice = createSlice({
-  name: 'counter',
+export const authSlice = createSlice({
+  name: 'auth',
   initialState,
   reducers: {
     // Set JWT token and decode it
@@ -43,6 +43,6 @@ export const counterSlice = createSlice({
   }
 })
 
-export const { setUser } = counterSlice.actions
+export const { setUser } = authSlice.actions
 
-export default counterSlice.reducer
+export default authSlice.reducer
