@@ -9,6 +9,7 @@ import Event from '@/pages/Event'
 import Login from '@/pages/Login'
 import SignUp from '@/pages/SignUp'
 import NewEvent from '@/pages/NewEvent'
+import EditEvent from '@/pages/EditEvent'
 import Navigation from '@/components/Navigation'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -45,6 +46,7 @@ const App = () => {
         <Route path='/user/:id' element={<User />} />
         <Route path='/event/:id' element={<Event />} />
         <Route path='/newevent' element={<NewEvent />} />
+        <Route path='/edit-event/:id' element={<EditEvent />} />
       </Routes>
 
       {/* Global level toast */}

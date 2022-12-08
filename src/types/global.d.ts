@@ -1,3 +1,24 @@
+interface AuthUser {
+  token: string
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  role: string
+  favouriteEvents: string[]
+  attendingEvents: string[]
+}
+
+interface User {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  role: string
+  favouriteEvents: string[]
+  attendingEvents: string[]
+}
+
 interface Event {
   id: string
   title: string

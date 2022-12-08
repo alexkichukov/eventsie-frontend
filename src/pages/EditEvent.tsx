@@ -1,31 +1,53 @@
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Formik, Form, Field } from 'formik'
 import { FaCheck } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import { useSelector } from '@/hooks'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
+import { getEvent } from '@/requests'
+import { updateEvent } from '@/requests/events'
 
-const NewEvent = () => {
-  const user = useSelector((state) => state.auth.user)
-  const categories = useSelector((state) => state.events.categories)
+const EditEvent = () => {
+  const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
 
+  const user = useSelector((state) => state.auth.user)
+  const categories = useSelector((state) => state.events.categories)
+
+  const [event, setEvent] = useState<Event | null>(null)
+  const [error, setError] = useState(false)
+
   useEffect(() => {
-    if (!user) navigate('/login', { replace: true })
-  }, [user])
+    if (!user) return navigate('/login', { replace: true })
+    if (!id) return navigate('/', { replace: true })
+
+    const fetchEvent = async () => {
+      try {
+        const event = await getEvent(id)
+        setEvent(event)
+      } catch {
+        toast.error('Could not fetch event data')
+        setError(true)
+      }
+    }
+    fetchEvent()
+  }, [user, id])
+
+  if (error) return <div className='container py-20 text-center text-red-500'>Unexpected error</div>
+  if (!event) return <div className='container py-20 text-center text-neutral-500'>Loading...</div>
 
   const initialValues = {
-    title: '',
-    date: '',
-    category: '',
-    tags: '',
-    priceFrom: '',
-    priceTo: '',
-    address: '',
-    city: '',
-    postcode: '',
-    description: ''
+    title: event.title,
+    date: event.date,
+    category: event.category,
+    tags: event.tags.join(','),
+    priceFrom: event.price.from ? event.price.from.toString() : '',
+    priceTo: event.price.to ? event.price.to.toString() : '',
+    address: event.location.address,
+    city: event.location.city,
+    postcode: event.location.postcode,
+    description: event.description
   }
 
   const schema = Yup.object({
@@ -71,9 +93,10 @@ const NewEvent = () => {
     priceFrom,
     priceTo
   }: typeof initialValues) => {
-    const id = toast.loading('Adding event...')
+    const toastId = toast.loading('Updating event...')
 
     const body = {
+      id: id!,
       title: title.trim(),
       date: date.trim(),
       description: description.trim(),
@@ -82,7 +105,6 @@ const NewEvent = () => {
         .split(',')
         .map((tag) => tag.trim())
         .filter((tag) => tag !== ''),
-      createdBy: user!.id,
       location: {
         address: address.trim(),
         city: city.trim(),
@@ -95,32 +117,19 @@ const NewEvent = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/newEvent', {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${user!.token}`
-        }
+      await updateEvent(body, user!)
+
+      // Success - show notification, navigate to home
+      toast.update(toastId, {
+        render: 'Event Updated!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 5000
       })
-      const data = await response.json()
-
-      // An error occured
-      if (!response.ok) {
-        return toast.update(id, {
-          render: data.message,
-          type: 'error',
-          isLoading: false,
-          autoClose: 5000
-        })
-      }
-
-      // Success - show notification, save jwt token, navigate to home
-      toast.update(id, { render: 'Success!', type: 'success', isLoading: false, autoClose: 5000 })
       navigate('/')
     } catch {
-      toast.update(id, {
-        render: 'Unexpected error',
+      toast.update(toastId, {
+        render: 'Could not update event',
         type: 'error',
         isLoading: false,
         autoClose: 5000
@@ -131,7 +140,7 @@ const NewEvent = () => {
   return (
     <div className='container flex min-h-[calc(100vh-80px)] items-center justify-center'>
       <div>
-        <h1 className='mb-8 text-center text-3xl text-white'>Create event</h1>
+        <h1 className='mb-8 text-center text-3xl text-white'>Edit Event</h1>
         <Formik initialValues={initialValues} validationSchema={schema} onSubmit={onSubmit}>
           {({ errors, touched }) => (
             <Form className='grid grid-cols-[360px_360px] gap-10'>
@@ -191,7 +200,7 @@ const NewEvent = () => {
                   id='priceFrom'
                   name='priceFrom'
                   type='text'
-                  placeholder='Optional price lower range'
+                  placeholder='Price lower range'
                 />
 
                 <div className='mt-4 mb-1 flex items-center'>
@@ -254,7 +263,7 @@ const NewEvent = () => {
                 type='submit'
                 className='col-span-2 rounded-sm bg-fuchsia-700 px-4 py-2 font-medium text-white hover:bg-fuchsia-600  '
               >
-                Create
+                Update
               </button>
             </Form>
           )}
@@ -264,4 +273,4 @@ const NewEvent = () => {
   )
 }
 
-export default NewEvent
+export default EditEvent

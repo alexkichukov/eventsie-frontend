@@ -12,13 +12,13 @@ interface Props {
   priceFrom: number
   priceTo: number
   location: string
-  host: {
+  createdBy: {
     name: string
     id: string
   }
 }
 
-const EventCard = ({ id, title, priceFrom, priceTo, location, host }: Props) => {
+const EventCard = ({ id, title, priceFrom, priceTo, location, createdBy }: Props) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const user = useSelector((state) => state.auth.user)
@@ -100,11 +100,11 @@ const EventCard = ({ id, title, priceFrom, priceTo, location, host }: Props) => 
               <span
                 onClick={(e) => {
                   e.stopPropagation()
-                  navigate(`/user/${host.id}`)
+                  navigate(`/user/${createdBy.id}`)
                 }}
                 className='font-medium text-neutral-100 hover:text-neutral-300 hover:underline'
               >
-                {host.name}
+                {createdBy.name}
               </span>
             </span>
           </div>

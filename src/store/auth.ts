@@ -1,18 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-interface User {
-  token: string
-  id: string
-  email: string
-  firstName: string
-  lastName: string
-  role: string
-  favouriteEvents: string[]
-  attendingEvents: string[]
-}
-
 interface AuthState {
-  user: User | null
+  user: AuthUser | null
 }
 
 const initialState: AuthState = {
@@ -24,20 +13,20 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     // Set JWT token and decode it
-    setUser(state, action: PayloadAction<Partial<User> | null>) {
+    setUser(state, action: PayloadAction<Partial<AuthUser> | null>) {
       if (!action.payload) {
         state.user = null
         return
       }
 
       // Delete undefined props if any
-      for (const prop of Object.keys(action.payload) as (keyof User)[]) {
+      for (const prop of Object.keys(action.payload) as (keyof AuthUser)[]) {
         if (action.payload[prop] === undefined) delete action.payload[prop]
       }
 
       state.user = {
         ...state.user,
-        ...(action.payload as User)
+        ...(action.payload as AuthUser)
       }
     }
   }

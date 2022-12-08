@@ -70,7 +70,7 @@ const Navigation = () => {
 
   return (
     <>
-      <nav className='fixed w-full bg-fuchsia-700 shadow-sm'>
+      <nav className='fixed z-20 w-full bg-fuchsia-700 shadow-sm'>
         <div className='container flex h-20 items-center'>
           <NavLink to='/' className='mr-auto text-xl font-medium text-white'>
             Eventsie
