@@ -92,7 +92,7 @@ const User = () => {
         </div>
       ) : (
         <div className='text-neutral-400'>
-          There seems to be nothing. Favourite some{' '}
+          There seems to be nothing.{' '}
           {isOwner && (
             <>
               Create a{' '}
